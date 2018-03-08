@@ -8,5 +8,8 @@ setup(name='checkout_code',
       author_email='bretschner@i6.informatik.rwth-aachen.de',
       license='MIT',
       packages=['checkout_code'],
+	  install_requires=[
+      	'GitPython',
+      ],
       zip_safe=False)
 
