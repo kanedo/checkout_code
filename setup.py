@@ -1,7 +1,7 @@
 from setuptools import setup
 
 setup(name='checkout_code',
-      version='0.1',
+      version='0.2',
       description='Tool to checkout a specific commit to a unique location',
       url='',
       author='Gabriel Bretschner',
