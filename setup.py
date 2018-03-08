@@ -11,5 +11,6 @@ setup(name='checkout_code',
 	  install_requires=[
       	'GitPython',
       ],
+	  scripts=['bin/checkout_code'],
       zip_safe=False)
 
