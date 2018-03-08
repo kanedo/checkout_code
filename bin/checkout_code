@@ -32,6 +32,7 @@ def get_commit_message(commit):
 
 def main():
   logging.getLogger().setLevel(logging.INFO)
+  logging.basicConfig(format='[%(levelname)s:checkout_code] %(message)s', level=logging.INFO)
   p = optparse.OptionParser()
   p.add_option('--repository', '-r', help="path to the repository")
   p.add_option('--checkout-dir', '-d', default="/tmp/",
