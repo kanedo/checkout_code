@@ -24,3 +24,16 @@ checkout_code
   --get-path
 ```
 this will only print the path but **not** checkout the code. Its intendented to be used in a variable.
+
+
+## example usage in scripts
+
+
+```
+source env/bin/activate
+COMMIT="b59616685000ddb5583186bcb7fd4b3e3d481f19"
+checkout_code --repository ~/src/sockeye --checkout-dir ~/work/sockeye/ -c $COMMIT --use-prefix
+path=$(checkout_code --repository ~/src/sockeye --checkout-dir ~/work/sockeye/ -c $COMMIT --use-prefix --get-path)
+export PYTHONPATH="$path:$PYTHONPATH"
+```
+
