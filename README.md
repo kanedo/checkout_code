@@ -1,6 +1,12 @@
 # checkout_code
 Tool to checkout a specific commit to a unique location
 
+## installation
+
+```
+pip install .
+```
+
 ## usage
 
 ```
