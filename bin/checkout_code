@@ -5,7 +5,7 @@ from git import Repo
 from git import InvalidGitRepositoryError
 import shutil
 import logging
-
+from filelock import Timeout, FileLock
 
 
 def clean_up(working_dir):
@@ -62,30 +62,32 @@ def main():
 
   if os.path.exists(options.checkout_dir):
     working_dir = get_working_dir(options.checkout_dir, options.use_prefix, options.repository, options.commit_hash)
+    
+    lock = FileLock(working_dir.rstrip("/")+".lock")
+    with lock:
+        if not os.path.exists(working_dir):
+          logging.info("checkout repository " + options.repository + " to " + working_dir)
+          os.system("git clone " + options.repository + " " + working_dir)
+        else:
+          logging.info("directory " + working_dir + " already exists.") 
 
-    if not os.path.exists(working_dir):
-      logging.info("checkout repository " + options.repository + " to " + working_dir)
-      os.system("git clone " + options.repository + " " + working_dir)
-    else:
-      logging.info("directory " + working_dir + " already exists.") 
+        try:
+          logging.info("check if  " + working_dir + " is git repository.") 
+          repo = Repo(working_dir)
+          assert not repo.bare
+          try:
+            logging.info("try checking out  " + options.commit_hash)
+            repo.head.reference = repo.commit(options.commit_hash)
+            message = get_commit_message(repo.head.commit)
+            logging.info(message)
+            repo.git.reset('--hard')
+            logging.info("successfull")
 
-    try:
-      logging.info("check if  " + working_dir + " is git repository.") 
-      repo = Repo(working_dir)
-      assert not repo.bare
-      try:
-        logging.info("try checking out  " + options.commit_hash)
-        repo.head.reference = repo.commit(options.commit_hash)
-        message = get_commit_message(repo.head.commit)
-        logging.info(message)
-        repo.git.reset('--hard')
-        logging.info("successfull")
-
-      except ValueError as e:
-        logging.info("Commit " + options.commit_hash + " invalid")
-        clean_up(working_dir)
-    except InvalidGitRepositoryError as e:
-        logging.info(working_dir + " is not a valid repository")   
+          except ValueError as e:
+            logging.info("Commit " + options.commit_hash + " invalid")
+            clean_up(working_dir)
+        except InvalidGitRepositoryError as e:
+            logging.info(working_dir + " is not a valid repository")   
   else:
     logging.info("checkout dir " + options.checkout_dir + " does not exist")
 

@@ -10,6 +10,7 @@ setup(name='checkout_code',
       packages=['checkout_code'],
 	  install_requires=[
       	'GitPython',
+        'filelock'
       ],
 	  scripts=['bin/checkout_code'],
       zip_safe=False)
