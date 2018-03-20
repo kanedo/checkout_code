@@ -9,9 +9,10 @@ setup(name='checkout_code',
       license='MIT',
       packages=['checkout_code'],
 	  install_requires=[
-      	'GitPython',
-        'filelock'
+            'GitPython',
+            'filelock',
+            'python-dotenv'
       ],
-	  scripts=['bin/checkout_code'],
+	scripts=['bin/checkout_code'],
       zip_safe=False)
 
