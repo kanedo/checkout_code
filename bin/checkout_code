@@ -6,6 +6,8 @@ from git import InvalidGitRepositoryError
 import shutil
 import logging
 from filelock import Timeout, FileLock
+from dotenv import dotenv_values, find_dotenv
+
 
 
 def clean_up(working_dir):
@@ -33,9 +35,10 @@ def get_commit_message(commit):
 def main():
   logging.getLogger().setLevel(logging.INFO)
   logging.basicConfig(format='[%(levelname)s:checkout_code] %(message)s', level=logging.INFO)
+
   p = optparse.OptionParser()
   p.add_option('--repository', '-r', help="path to the repository")
-  p.add_option('--checkout-dir', '-d', default="/tmp/",
+  p.add_option('--checkout-dir', '-d',
     help="base path for checkouts")
   p.add_option('--commit-hash', '-c',
     help="the commit hash to be checked out")
@@ -44,31 +47,48 @@ def main():
   p.add_option('--get-path', action="store_true", 
     dest="get_path", 
     help="only return the path where the code would be. useful for cli")
+  p.add_option('--env', help="path to environment file for configuration")
   options, arguments = p.parse_args()
+  dotenv_file = options.env if options.env is not None else find_dotenv()
+  if not os.path.exists(dotenv_file):
+    logging.warning("env file could not be found at %s" % dotenv_file)
+  env_config = dotenv_values(dotenv_file)
 
-  if options.repository is None:
+  repository = env_config["repository"] if "repository" in env_config else None
+  repository = options.repository if options.repository is not None else repository
+  if repository is None:
     logging.error("repository required")
     return
+
   if options.commit_hash is None:
     logging.error("commit-hash required")
     return
 
+  checkout_dir = env_config["checkout_dir"] if "checkout_dir" in env_config else None
+  checkout_dir = options.checkout_dir if options.checkout_dir is not None else checkout_dir
+  if checkout_dir is None:
+    logging.error("checkout_dir required")
+    return
+
+  use_prefix = env_config["use_prefix"] == "True" if "use_prefix" in env_config else False
+  use_prefix = True if options.use_prefix else use_prefix
+
   if options.get_path:
-    print(get_working_dir(options.checkout_dir, options.use_prefix, options.repository, options.commit_hash))
+    print(get_working_dir(checkout_dir, use_prefix, repository, options.commit_hash))
     return
 
   if options.commit_hash == "HEAD":
       # do nothing for commit HEAD
       return
 
-  if os.path.exists(options.checkout_dir):
-    working_dir = get_working_dir(options.checkout_dir, options.use_prefix, options.repository, options.commit_hash)
+  if os.path.exists(checkout_dir):
+    working_dir = get_working_dir(checkout_dir, use_prefix, repository, options.commit_hash)
     
     lock = FileLock(working_dir.rstrip("/")+".lock")
     with lock:
         if not os.path.exists(working_dir):
-          logging.info("checkout repository " + options.repository + " to " + working_dir)
-          os.system("git clone " + options.repository + " " + working_dir)
+          logging.info("checkout repository " + repository + " to " + working_dir)
+          os.system("git clone " + repository + " " + working_dir)
         else:
           logging.info("directory " + working_dir + " already exists.") 
 
@@ -90,7 +110,7 @@ def main():
         except InvalidGitRepositoryError as e:
             logging.info(working_dir + " is not a valid repository")   
   else:
-    logging.info("checkout dir " + options.checkout_dir + " does not exist")
+    logging.info("checkout dir " + checkout_dir + " does not exist")
 
 
  

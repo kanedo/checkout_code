@@ -43,3 +43,30 @@ path=$(checkout_code --repository ~/src/sockeye --checkout-dir ~/work/sockeye/ -
 export PYTHONPATH="$path:$PYTHONPATH"
 ```
 
+## environment files
+
+To make it easier to use you can also use [`.env`](https://github.com/theskumar/python-dotenv) files instead or in addition to CLI-options. You can specify the file by using `--env /path/to/.env/file` or it will [automatically search for files](https://github.com/theskumar/python-dotenv#getting-started). In the environment file just use
+```
+repository=/path/to/repo
+checkout_dir=/path/to/checkout_dir
+use_prefix=True
+```
+to specify your settings. 
+
+**Note** command line arguments will always override environment settings
+
+
+## version history
+
+### 0.1 2018-03-08
+
+* initial version
+
+### 0.2 2018-03-08
+
+* added file lock
+* added requirements
+
+### 0.3 2018-03-20
+
+* added loading of env files

@@ -1,7 +1,7 @@
 from setuptools import setup
 
 setup(name='checkout_code',
-      version='0.2',
+      version='0.3',
       description='Tool to checkout a specific commit to a unique location',
       url='',
       author='Gabriel Bretschner',
@@ -9,9 +9,10 @@ setup(name='checkout_code',
       license='MIT',
       packages=['checkout_code'],
 	  install_requires=[
-      	'GitPython',
-        'filelock'
+            'GitPython',
+            'filelock',
+            'python-dotenv'
       ],
-	  scripts=['bin/checkout_code'],
+	scripts=['bin/checkout_code'],
       zip_safe=False)
 
