@@ -43,6 +43,10 @@ path=$(checkout_code --repository ~/src/sockeye --checkout-dir ~/work/sockeye/ -
 export PYTHONPATH="$path:$PYTHONPATH"
 ```
 
+## development version a.k.a `HEAD`
+
+if you specify the commit as `HEAD` the tool will not checkout anything but the `--get-path` option will return your repository. That way you can use `HEAD` to point to your latest, possible uncommited, version
+
 ## environment files
 
 To make it easier to use you can also use [`.env`](https://github.com/theskumar/python-dotenv) files instead or in addition to CLI-options. You can specify the file by using `--env /path/to/.env/file` or it will [automatically search for files](https://github.com/theskumar/python-dotenv#getting-started). In the environment file just use
