@@ -50,9 +50,11 @@ def main():
   p.add_option('--env', help="path to environment file for configuration")
   options, arguments = p.parse_args()
   dotenv_file = options.env if options.env is not None else find_dotenv()
-  if not os.path.exists(dotenv_file):
+  env_config = {}
+  if not os.path.isfile(dotenv_file):
     logging.warning("env file could not be found at %s" % dotenv_file)
-  env_config = dotenv_values(dotenv_file)
+  else:
+    env_config = dotenv_values(dotenv_file)
 
   repository = env_config["repository"] if "repository" in env_config else None
   repository = options.repository if options.repository is not None else repository
@@ -71,7 +73,7 @@ def main():
     return
 
   use_prefix = env_config["use_prefix"] == "True" if "use_prefix" in env_config else False
-  use_prefix = True if options.use_prefix else use_prefix
+  use_prefix = True if options.use_prefix is not None else use_prefix
 
   if options.get_path:
     print(get_working_dir(checkout_dir, use_prefix, repository, options.commit_hash))
