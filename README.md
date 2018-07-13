@@ -10,10 +10,10 @@ pip install .
 ## usage
 
 ```
-checkout_code 
+checkout_code
   --repository /path/to/git/repo
-  --checkout-dir /path/to/version/location 
-  -c commit_hash 
+  --checkout-dir /path/to/version/location
+  -c commit_hash
   --use-prefix
 ```
 
@@ -22,10 +22,10 @@ checkout_code
 To get the final path use an additional `--get-path`, i.e.
 
 ```
-checkout_code 
+checkout_code
   --repository /path/to/git/repo
-  --checkout-dir /path/to/version/location 
-  -c commit_hash 
+  --checkout-dir /path/to/version/location
+  -c commit_hash
   --use-prefix
   --get-path
 ```
@@ -55,7 +55,7 @@ repository=/path/to/repo
 checkout_dir=/path/to/checkout_dir
 use_prefix=True
 ```
-to specify your settings. 
+to specify your settings.
 
 **Note** command line arguments will always override environment settings
 
@@ -74,3 +74,7 @@ to specify your settings.
 ### 0.3 2018-03-20
 
 * added loading of env files
+
+### 0.4 2018-07-13
+
+* return exit code 1 if checkout_dir does not exists
