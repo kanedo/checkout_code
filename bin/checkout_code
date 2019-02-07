@@ -48,7 +48,11 @@ def main():
     dest="get_path",
     help="only return the path where the code would be. useful for cli")
   p.add_option('--env', help="path to environment file for configuration")
+  p.add_option('--timeout', type=int, help="set timeout (seconds) for file lock.", default=10)
+
+
   options, arguments = p.parse_args()
+
   dotenv_file = options.env if options.env is not None else find_dotenv()
   env_config = {}
   if not os.path.isfile(dotenv_file):
@@ -90,32 +94,34 @@ def main():
 
   if os.path.exists(checkout_dir):
     working_dir = get_working_dir(checkout_dir, use_prefix, repository, options.commit_hash)
+    try:
+      lock = FileLock(working_dir.rstrip("/")+".lock", timeout=options.timeout)
+      with lock:
+          if not os.path.exists(working_dir):
+            logging.info("checkout repository " + repository + " to " + working_dir)
+            os.system("git clone " + repository + " " + working_dir)
+          else:
+            logging.info("directory " + working_dir + " already exists.")
 
-    lock = FileLock(working_dir.rstrip("/")+".lock")
-    with lock:
-        if not os.path.exists(working_dir):
-          logging.info("checkout repository " + repository + " to " + working_dir)
-          os.system("git clone " + repository + " " + working_dir)
-        else:
-          logging.info("directory " + working_dir + " already exists.")
-
-        try:
-          logging.info("check if  " + working_dir + " is git repository.")
-          repo = Repo(working_dir)
-          assert not repo.bare
           try:
-            logging.info("try checking out  " + options.commit_hash)
-            repo.head.reference = repo.commit(options.commit_hash)
-            message = get_commit_message(repo.head.commit)
-            logging.info(message)
-            repo.git.reset('--hard')
-            logging.info("successfull")
+            logging.info("check if  " + working_dir + " is git repository.")
+            repo = Repo(working_dir)
+            assert not repo.bare
+            try:
+              logging.info("try checking out  " + options.commit_hash)
+              repo.head.reference = repo.commit(options.commit_hash)
+              message = get_commit_message(repo.head.commit)
+              logging.info(message)
+              repo.git.reset('--hard')
+              logging.info("successfull")
 
-          except ValueError as e:
-            logging.info("Commit " + options.commit_hash + " invalid")
-            clean_up(working_dir)
-        except InvalidGitRepositoryError as e:
-            logging.info(working_dir + " is not a valid repository")
+            except ValueError as e:
+              logging.info("Commit " + options.commit_hash + " invalid")
+              clean_up(working_dir)
+          except InvalidGitRepositoryError as e:
+              logging.info(working_dir + " is not a valid repository")
+    except Timeout:
+      logging.error("Could not acquire lock. Timeout.")
   else:
     logging.error("checkout dir " + checkout_dir + " does not exist")
     exit(1)
