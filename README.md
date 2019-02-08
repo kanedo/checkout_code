@@ -4,7 +4,7 @@ Tool to checkout a specific commit to a unique location
 ## installation
 
 ```
-pip install .
+pip install checkout_code
 ```
 
 ## usage
