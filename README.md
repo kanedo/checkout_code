@@ -78,3 +78,8 @@ to specify your settings.
 ### 0.4 2018-07-13
 
 * return exit code 1 if checkout_dir does not exists
+
+### 0.5 2019-02-08
+
+* add default timeout for filelock (closes [#2](https://github.com/kanedo/checkout_code/issues/2))
+* added option to change timeout value
